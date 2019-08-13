@@ -48,7 +48,8 @@ void setup() {
       pinMode(BATT_PIN, INPUT);
     #endif
     
-    Serial.println("HW: " + String(hwId));
+    Serial.println("HW: "); 
+    Serial.print(String(hwId));
     sleepTime = sleepTime * 60000;
     
     #if defined(DHTPIN)
@@ -58,8 +59,10 @@ void setup() {
 
 void loop() {
     // WI-FI CONECTING
-    Serial.println(F("WIFI SSID: ")+String(ssid));
-    Serial.println(F("SLEEP INTERVAL: ")+String(sleepTime));
+    Serial.println(F("WIFI SSID: "));
+    Serial.print(String(ssid));
+    Serial.println(F("SLEEP INTERVAL: "));
+    Serial.print(String(sleepTime));
     
     bool restorSuccesful = restorSetting();
     
@@ -80,7 +83,8 @@ void loop() {
     }
     
     Serial.println(F("CONECTED TO WIFI"));
-    Serial.println("IP: " + WiFi.localIP().toString());
+    Serial.println("IP: ");
+    Serial.print(WiFi.localIP().toString());
     
     HTTPClient http;
     http.begin(server);
@@ -107,7 +111,8 @@ void loop() {
     
     String requestJson = "";
     serializeJson(sendContent, requestJson);
-    Serial.println(F("JSON: ") + requestJson);
+    Serial.println(F("JSON: ")); 
+    Serial.print(requestJson);
     
     int httpCode = http.POST(requestJson);
     String payload = http.getString();  //Get the response payload
@@ -118,14 +123,17 @@ void loop() {
     sleepTime = doc["device"]["sleepTime"];
     WiFi.hostname(hostname);
     
-    Serial.println(F("HTTP CODE: ") + String(httpCode) + ""); //Print HTTP return code
-    Serial.println(F("HTTP BODY: ") + String(payload) + "");  //Print request response payload
+    Serial.println(F("HTTP CODE: "));
+    Serial.print(String(httpCode)); //Print HTTP return code
+    Serial.println(F("HTTP BODY: "));
+    Serial.print(String(payload));  //Print request response payload
     http.end();  //Close connection
     Serial.println(F("DISCONECTED FROM WIFI"));
     WiFi.disconnect();
     
     if (deepSleepOn) {
-        Serial.println(F("GOING TO SLEEP FOR ") + String(sleepTime));
+        Serial.println(F("GOING TO SLEEP FOR ")); 
+        Serial.print(String(sleepTime));
         ESP.deepSleep((sleepTime * 60) * 1000000, RF_DEFAULT);  // 20e6 is 20 microseconds
         delay(1000);
     } else {
@@ -209,22 +217,26 @@ bool restorSetting() {
             ssid += char(EEPROM.read(i));
         }
         if (ssid == "") return false;
-        Serial.println(F("SSID: ") + String(ssid));
+        Serial.println(F("SSID: "));
+        Serial.print(String(ssid));
         for (int i = 64; i < 128; ++i) {
             pasw += char(EEPROM.read(i));
         }
         if (pasw == "") return false;
-        Serial.println(F("PASS: ") + String(pasw));
+        Serial.println(F("PASS: ")); 
+        Serial.print(String(pasw));
         for (int i = 128; i < 192; ++i) {
             hwId += char(EEPROM.read(i)); 
         }
         if (hwId == "") return false;
-        Serial.println(F("TOKEN: ") + String(hwId));
+        Serial.println(F("TOKEN: "));
+        Serial.print(String(hwId));
         for (int i = 192; i < 256; ++i) {
             url += char(EEPROM.read(i));
         }
         if (url == "") return false;
-        Serial.println(F("URL: ") + String(url));
+        Serial.println(F("URL: "));
+        Serial.print(String(url));
         return true;
     } else {
         return false;
@@ -261,7 +273,8 @@ String scanWifi(){
         WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
         WiFi.softAP(apSSID);
         //dnsServer.start(53, "*", apIP);
-        Serial.println(F("Starting Access Point at ") + apSSID);
+        Serial.println(F("Starting Access Point at "));
+        Serial.print(apSSID);
     }
     return wifiList;
 }
@@ -278,22 +291,30 @@ void setupWebServer(){
         }
         
         Serial.println(F("Writing EEPROM..."));
-        Serial.println(F("SSID:") + ssid);
+        Serial.println(F("SSID:"));
+        Serial.print(ssid);
+        
         for (int i = 0; i < ssid.length(); ++i) {
             EEPROM.write(i,ssid[i]);
         }
         
-        Serial.println(F("PASW:") + pasw);
+        Serial.println(F("PASW:"));
+        Serial.print(pasw);
+        
         for (int i = 0; i < pasw.length(); ++i) {
             EEPROM.write(64 + i, pasw[i]);
         }
         
-        Serial.println(F("TOKEN:") + hwId);
+        Serial.println(F("TOKEN:"));
+        Serial.print(hwId);
+        
         for (int i = 0; i < hwId.length(); ++i) {
             EEPROM.write(128 + i, hwId[i]);
         }
         
-        Serial.println(F("URL:") + url);
+        Serial.println(F("URL:")); 
+        Serial.print(String(url));
+        
         for (int i = 0; i < url.length(); ++i) {
             EEPROM.write(192 + i, url[i]);
         }
@@ -320,9 +341,9 @@ void setupWebServer(){
             s += "<p>Humidity: "+String(getHumidity())+" %</p>";
         #endif 
         
-        if (lightSensor){
+        #if defined(BATT_PIN)
             s += "<p>Light: "+String(getLight())+" </p>";
-        }  
+        #endif
         
         #if defined(BATT_PIN)
           s += "<p>Battery: "+String(getBattery())+"V </p>";
