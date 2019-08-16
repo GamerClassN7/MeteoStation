@@ -396,5 +396,3 @@ String makePage(String title, String contents) {
   s += F("</body></html>");
   return s;
 }
-
-
