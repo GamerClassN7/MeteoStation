@@ -115,7 +115,7 @@ void loop() {
   Serial.println(requestJson);
   
   http.begin(client, url);
-  http.addHeader("Content-Type", "text/plain");
+  http.addHeader("Content-Type", "application/json");
   http.addHeader("Content-Length", "2000");
   
   int httpCode = http.POST((String) requestJson);
